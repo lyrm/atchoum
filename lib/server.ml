@@ -7,10 +7,24 @@ module Schema = Mcp_kit.Schema
 
 let ( let* ) = Result.bind
 
+(* Sent to the client at initialization; Claude Code adds it to the system
+   prompt while the server is connected. Keep it short. *)
+let instructions =
+  {|Merlin-backed tools for OCaml code (.ml and .mli files). Merlin type-checks the code, so its answers are exact where text search only guesses.
+
+When working on OCaml code, use these tools instead of grep, sed or reading files:
+- type of an expression or identifier: type_enclosing;
+- where an identifier is defined, in the project or in a library: locate (look_for "interface" gives the .mli).
+
+Every tool takes a file and a position: line starts at 1 and col at 0. Pass absolute paths.
+
+Answers are Merlin's raw JSON: when "class" is "return", the result is in "value". If Merlin reports an unbound module of the same project, run `dune build` first: Merlin reads the build artefacts of the other modules.|}
+
 let type_enclosing_description =
   "Type of the expression at LINE:COL in an OCaml file, as reported by Merlin. \
-   Lines start at 1, columns at 0. Returns Merlin's raw JSON answer: the \
-   enclosing expressions, innermost first, with their positions and types."
+   Use it instead of reading the surrounding code to work out a type. Lines \
+   start at 1, columns at 0. Returns Merlin's raw JSON answer: the enclosing \
+   expressions, innermost first, with their positions and types."
 
 (* Every tool takes a position in a file. *)
 let position_properties =
@@ -51,9 +65,10 @@ let type_enclosing ~fs ~process_mgr =
 
 let locate_description =
   "Find where the identifier at LINE:COL (or PREFIX) in an OCaml file is \
-   defined, as reported by Merlin. Lines start at 1, columns at 0. Returns \
-   Merlin's raw JSON answer: the file and position of the definition, or a \
-   string explaining why it could not be found."
+   defined, as reported by Merlin. Use it instead of grep to find a \
+   definition, including in libraries and the standard library. Lines start at \
+   1, columns at 0. Returns Merlin's raw JSON answer: the file and position of \
+   the definition, or a string explaining why it could not be found."
 
 let locate_schema =
   Schema.object_
@@ -91,7 +106,9 @@ let locate ~fs ~process_mgr =
         (Merlin.locate ~fs ~process_mgr ?prefix ?look_for ~file ~line ~col ()))
 
 let create ~fs ~process_mgr () =
-  let server = Mcp_kit.Server.create ~name:"atchoum" ~version:"0.1.0" () in
+  let server =
+    Mcp_kit.Server.create ~name:"atchoum" ~version:"0.1.0" ~instructions ()
+  in
   match
     Mcp_kit.Server.add_tools server
       [ type_enclosing ~fs ~process_mgr; locate ~fs ~process_mgr ]

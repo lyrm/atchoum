@@ -43,6 +43,11 @@ The tools appear in Claude Code as `mcp__plugin_atchoum_merlin__<tool>`.
 Each tool runs `ocamlmerlin single <command>` with the file's contents on
 standard input.
 
+Guidance on when to use the tools lives in two places in
+[`lib/server.ml`](lib/server.ml): the server `instructions`, which Claude Code
+adds to the system prompt while the server is connected, and each tool's
+description.
+
 ## Requirements
 
 - [opam](https://opam.ocaml.org/) 2.2 or later, to build the server.
