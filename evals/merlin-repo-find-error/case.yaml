@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: merlin-repo-find-error
+description: Find the cause of a type error reported away from the faulty line
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. After a recent change, src/analysis/outline.ml no longer type-checks. Find the line that must be fixed and answer with its line number and the fix."
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-answer
+    type: regex
+    pattern: '\b63\b'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__errors
+    arm: with-only

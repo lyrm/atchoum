@@ -1,22 +1,24 @@
 (** The atchoum MCP server: Merlin queries declared as mcp-kit tools.
 
-    This is the only module that depends on mcp-kit. *)
+    This is the only module that depends on mcp-kit. Every tool targets code
+    with [file] and [line] plus [identifier] (found on that line) or [col], and
+    answers with short text; failures are error results. *)
 
 [@@@ai_disclosure "ai-generated"]
 [@@@ai_model "claude-opus-5-5"]
 [@@@ai_provider "Anthropic"]
 
-val type_enclosing :
-  fs:_ Eio.Path.t -> process_mgr:_ Eio.Process.mgr -> Mcp_kit.Tool.t
-(** The [type_enclosing] tool, with arguments [file], [line] (from 1) and [col]
-    (from 0). It returns Merlin's raw JSON answer as text, or an error result
-    when Merlin fails. See {!Merlin.type_enclosing}. *)
+val find_identifier : string -> string -> int option
+(** [find_identifier line ident] is the column of the first whole-word
+    occurrence of [ident] in [line]; for a qualified [ident] ([M.x]), the column
+    of its last component. *)
 
-val locate : fs:_ Eio.Path.t -> process_mgr:_ Eio.Process.mgr -> Mcp_kit.Tool.t
-(** The [locate] tool, with arguments [file], [line] (from 1) and [col] (from
-    0), and optionally [prefix] and [look_for] (["interface"] or
-    ["implementation"]). It returns Merlin's raw JSON answer as text, or an
-    error result when Merlin fails. See {!Merlin.locate}. *)
+val tools :
+  fs:_ Eio.Path.t -> process_mgr:_ Eio.Process.mgr -> Mcp_kit.Tool.t list
+(** Every tool, in the order of {!create}'s listing: [type_enclosing], [locate],
+    [locate_type], [document], [occurrences], [outline], [type_expression],
+    [search_by_type], [errors], [rename], [case_analysis], [construct],
+    [qualify_open]. *)
 
 val create :
   fs:_ Eio.Path.t -> process_mgr:_ Eio.Process.mgr -> unit -> Mcp_kit.Server.t

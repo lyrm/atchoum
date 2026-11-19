@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: merlin-repo-callers
+description: Callers of a function that has homonyms in the vendored compiler
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. Which files call the `wrap_printing_env` function declared on line 47 of src/analysis/type_utils.mli (in its module Printtyp)? Only that function, not the compiler's own wrap_printing_env. Answer with the list of file paths."
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-answer
+    type: regex
+    pattern: '^(?=[\s\S]*signature_help\.ml)(?=[\s\S]*type_enclosing\.ml)(?=[\s\S]*query_commands\.ml)(?=[\s\S]*type_utils\.ml)'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__occurrences
+    arm: with-only

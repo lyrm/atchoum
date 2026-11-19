@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: merlin-repo-rename
+description: Project-wide rename of a function that has homonyms in the vendored compiler
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. Rename the function `wrap_printing_env` declared on line 47 of src/analysis/type_utils.mli (in its module Printtyp) to `with_printing_env`, everywhere it is used. Do not touch the compiler's own wrap_printing_env under src/ocaml/. Then answer with the number of occurrences you renamed."
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Grep, Glob, Edit]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-answer
+    type: regex
+    pattern: '\b13\b'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__rename
+    arm: with-only
