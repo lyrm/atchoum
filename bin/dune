@@ -1,0 +1,5 @@
+(executable
+ (name main)
+ (public_name atchoum-mcp)
+ (package atchoum)
+ (libraries atchoum eio eio_main mcp-kit-eio))
