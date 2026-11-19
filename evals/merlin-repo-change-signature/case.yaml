@@ -1,0 +1,22 @@
+schema_version: "1.1"
+name: merlin-repo-change-signature
+description: Add a labelled argument to a function with homonyms in the vendored compiler and update all its call sites
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. Add a labelled argument `~short:bool` as the first parameter of the function `type_scheme` declared on line 41 of src/analysis/type_utils.mli (in its module Printtyp), in the .mli and in its definition; the argument is unused for now. Then update every call to this function, and only to this one (not the compiler's own type_scheme), so that it passes `~short:false`. Answer with the list of the call sites you updated, as file:line."
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Grep, Glob, Edit]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  # The five calls: type_utils.ml lines 212, 224 and 241, query_commands.ml
+  # lines 480 and 507 (line 134 is the compiler's type_scheme).
+  - name: all-call-sites
+    type: regex
+    pattern: '^(?=[\s\S]*type_utils\.ml\D{0,40}212)(?=[\s\S]*224)(?=[\s\S]*241)(?=[\s\S]*query_commands\.ml\D{0,40}480)(?=[\s\S]*507)'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__occurrences
+    arm: with-only

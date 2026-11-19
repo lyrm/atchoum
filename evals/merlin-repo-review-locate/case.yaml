@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: merlin-repo-review-locate
+description: Review Merlin's locate module (1087 lines) and find two injected logic bugs that type-check
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. Changes to src/analysis/locate.ml are about to be merged and the code compiles. Review this module and report the bugs you find: for each one, give its line number and explain it. Answer with a list of `line N: explanation`."
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  # Bug 1, line 177: Preferences.is_preferred prefers an .mli exactly when an
+  # .ml is preferred.
+  - name: finds-preference-bug
+    type: regex
+    pattern: '\b17[678]\b'
+  # Bug 2, line 476: find_source's heuristic sort is reversed, so the least
+  # likely file is picked.
+  - name: finds-sort-bug
+    type: regex
+    pattern: '\b47[567]\b'

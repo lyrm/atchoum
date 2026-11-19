@@ -1,0 +1,23 @@
+schema_version: "1.1"
+name: merlin-repo-trace-locate
+description: Trace the call chain of a locate query across modules, through homonymous functions
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. When Merlin answers a `locate` query (the `Locate` case of Query_protocol), which chain of functions is called, from the dispatch of the query down to the function that finds the source file of the definition? List each function in call order, with the file and line of its definition."
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  # dispatch (query_commands.ml) -> Locate.from_string (locate.ml:864) ->
+  # from_longident (819) -> from_path (736, not the one at 830) ->
+  # find_loc_of_uid (646) -> find_source (559, not the one at 391).
+  - name: correct-chain
+    type: regex
+    pattern: '^(?=[\s\S]*from_string)(?=[\s\S]*from_longident)(?=[\s\S]*from_path[^\n]{0,160}736)(?=[\s\S]*find_loc_of_uid)(?=[\s\S]*find_source[^\n]{0,160}559)'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__locate
+    arm: with-only

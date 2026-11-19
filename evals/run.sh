@@ -36,7 +36,7 @@ fi
 $in_switch claude plugin eval "$stage" \
   --scaffold \
   --mocks off \
-  --allow-tools 'mcp__plugin_atchoum_merlin__*' Edit \
+  --allow-tools 'mcp__plugin_atchoum_merlin__*' Edit Write \
   --trust-plugin \
   --no-publish \
   --output-dir "$out" \

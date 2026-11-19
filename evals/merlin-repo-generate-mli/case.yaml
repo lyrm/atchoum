@@ -1,0 +1,21 @@
+schema_version: "1.1"
+name: merlin-repo-generate-mli
+description: Write the .mli of a 212-line file without interface, with exact inferred types
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. src/ocaml-index/lib/index.ml has no interface. Write src/ocaml-index/lib/index.mli, exposing every top-level value and module of index.ml with its exact inferred type (no abstraction, no renaming). Then print the whole content of the .mli in your final answer, in an ocaml code block."
+  max_turns: 40
+  timeout_seconds: 900
+  allowed_tools: [Read, Grep, Glob, Write]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  # The exact types of the eight top-level values, as inferred by Merlin.
+  - name: correct-signatures
+    type: regex
+    pattern: '^(?=[\s\S]*val\s+with_root\s*:\s*\?root:string\s*->\s*string\s*->\s*string)(?=[\s\S]*val\s+add_root\s*:\s*root:string\s+option\s*->\s*Longident\.t\s+Location\.loc\s*->\s*Longident\.t\s+Location\.loc)(?=[\s\S]*val\s+merge\s*:\s*(?:Index_format\.)?Lid_set\.t\s+(?:Index_format\.)?Uid_map\.t\s*->\s*(?:Index_format\.)?Lid_set\.t\s+(?:Index_format\.)?Uid_map\.t\s*->\s*(?:Index_format\.)?Lid_set\.t\s+(?:Index_format\.)?Uid_map\.t)(?=[\s\S]*val\s+gather_locs_from_fragments\s*:\s*root:string\s+option\s*->\s*rewrite_root:bool\s*->\s*(?:Index_format\.)?Lid_set\.t\s+(?:Index_format\.)?Uid_map\.t\s*->\s*Typedtree\.item_declaration\s+Shape\.Uid\.Tbl\.t\s*->\s*(?:Index_format\.)?Lid_set\.t\s+(?:Index_format\.)?Uid_map\.t)(?=[\s\S]*val\s+init_load_path_once\s*:\s*do_not_use_cmt_loadpath:bool\s*->\s*dirs:Load_path\.paths\s*->\s*Load_path\.paths\s*->\s*unit)(?=[\s\S]*val\s+index_of_cmt\s*:\s*into:(?:Index_format\.)?index\s*->\s*root:string\s+option\s*->\s*rewrite_root:bool\s*->\s*build_path:Load_path\.paths\s*->\s*do_not_use_cmt_loadpath:bool\s*->\s*store_shapes:bool\s*->\s*Cmt_format\.cmt_infos\s*->\s*(?:Index_format\.)?index)(?=[\s\S]*val\s+merge_index\s*:\s*store_shapes:bool\s*->\s*into:(?:Index_format\.)?index\s*->\s*(?:Index_format\.)?index\s*->\s*(?:Index_format\.)?index)(?=[\s\S]*val\s+from_files\s*:\s*store_shapes:bool\s*->\s*output_file:string\s*->\s*root:string\s+option\s*->\s*rewrite_root:bool\s*->\s*build_path:Load_path\.paths\s*->\s*do_not_use_cmt_loadpath:bool\s*->\s*string\s+list\s*->\s*unit)'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__outline
+    arm: with-only

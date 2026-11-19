@@ -153,6 +153,10 @@ dune build
 | `merlin-repo-callers` | `occurrences` | Files calling a function that has homonyms in the vendored compiler |
 | `merlin-repo-find-error` | `errors` | Cause of a type error injected by the scaffold and reported on other lines |
 | `merlin-repo-rename` | `rename` | Project-wide rename of that function (13 occurrences in 5 files) |
+| `merlin-repo-generate-mli` | `outline` | Write the `.mli` of `src/ocaml-index/lib/index.ml` (212 lines), with the exact inferred types |
+| `merlin-repo-change-signature` | `occurrences` | Add `~short:bool` to `Type_utils.Printtyp.type_scheme` and update its 5 call sites, not the compiler's homonym |
+| `merlin-repo-trace-locate` | `locate` | Call chain of a `locate` query from the dispatch to the source lookup, through homonymous `from_path` and `find_source` |
+| `merlin-repo-review-locate` | any | Review `src/analysis/locate.ml` (1087 lines) and find two logic bugs injected by the scaffold, which type-check (lines 177 and 476) |
 
 The `hard` cases scaffold small dune projects (`./evals/run.sh --tag hard`);
 they run `dune build`.

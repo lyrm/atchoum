@@ -10,13 +10,16 @@ let ( let* ) = Result.bind
 (* Sent to the client at initialization; Claude Code adds it to the system
    prompt while the server is connected. Keep it short. *)
 let instructions =
-  {|Merlin-backed tools for OCaml code (.ml and .mli files). Merlin type-checks the code, so its answers are exact where text search and reading only guess. When working on OCaml code, prefer them to grep, sed or reading whole files:
-- understand: type_enclosing (type; expand=true for a module's signature), locate (definition), locate_type (definition of a value's type), document (doc comment), occurrences (uses, project-wide), outline (what a file defines), type_expression (type of any expression), search_by_type (find a function by its type);
-- modify: errors (check a file after each change), rename (all uses, project-wide), case_analysis (generate match cases), construct (fill a typed hole _), qualify_open (remove or expand an open).
+  {|Merlin-backed tools for OCaml code (.ml and .mli files). Merlin resolves names the way the compiler does: through open, include, module aliases and shadowing, and never confuses two definitions with the same name. grep and reading do; in OCaml code, same-name definitions are common (local modules shadowing the stdlib, vendored copies, helpers named create, find, pp...). So for OCaml code, use these tools instead of grep or reading whole files, by task:
+- Where is X defined? Follow a call chain? locate on each call, from the entry point down: each answer gives the definition's line, so there is no file to read.
+- Who calls this function or uses this type? occurrences (project-wide), not grep.
+- What is the type of X? type_enclosing (expand=true: a module's signature); type_expression for an expression not in the file; locate_type for where a value's type is defined.
+- What does this file define, before reading it? outline, then read only the lines you need. document gives a doc comment.
+- Does a function with this type exist? search_by_type.
+- Is my change correct? errors on each modified file. If you changed the interface of another module, its users are checked against the last build: run `dune build` first.
+- Rename everywhere: rename. Add match cases: case_analysis. Fill a hole _: construct. Remove an open: qualify_open. These write the files themselves (apply=false only shows the edits): read a file again before editing it yourself.
 
-Target code with file and line plus either identifier (the name as written on that line) or col (from 0); lines start at 1.
-
-rename, case_analysis and qualify_open write the files themselves (apply=false only shows the edits): read a file again before editing it yourself. Project-wide answers need the build artefacts: run `dune build` (and `dune build @ocaml-index` for occurrences and rename) when Merlin reports unbound modules or misses uses.|}
+Load the tools you need in one tool search (select: several names). Target code with file and line plus either identifier (the name as written on that line) or col (from 0); lines start at 1. Project-wide answers need the build artefacts: run `dune build` (and `dune build @ocaml-index` for occurrences and rename) when Merlin reports unbound modules or misses uses.|}
 
 (* Arguments. *)
 
