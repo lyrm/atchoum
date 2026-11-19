@@ -1,0 +1,8 @@
+{
+  "name": "atchoum",
+  "version": "0.1.0",
+  "description": "Merlin-powered MCP tools for navigating and editing OCaml code, to use instead of grep, sed and other text-based tools.",
+  "author": { "name": "Carine Morel" },
+  "license": "MIT",
+  "keywords": ["ocaml", "merlin", "mcp"]
+}
