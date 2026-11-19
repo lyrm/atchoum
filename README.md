@@ -105,16 +105,43 @@ MCP configuration, where `${CLAUDE_PLUGIN_ROOT}` is undefined.
 If the executable has not been built, `/mcp` shows the server as failed; the
 rest of the plugin still loads.
 
-## Local testing
+## Using the plugin
 
-Load the plugin from a checkout without installing it:
+Build the server first (see [Build](#build)). Claude Code launches the
+executable from the checkout, so it must exist in `_build`.
+
+### Install from the local marketplace (CLI and VS Code)
+
+`.claude-plugin/marketplace.json` makes the checkout a marketplace named
+`atchoum-dev`. In Claude Code, in the terminal or in the VS Code extension:
+
+```
+/plugin marketplace add /path/to/atchoum
+/plugin install atchoum@atchoum-dev
+```
+
+In VS Code, the **Manage plugins** dialog (`/plugins`) does the same from its
+Marketplaces tab. A plugin from a local marketplace loads in place: nothing is
+copied, and `${CLAUDE_PLUGIN_ROOT}` is the checkout itself.
+
+### Load for one session only (CLI)
 
 ```sh
 claude --plugin-dir /path/to/atchoum
 ```
 
-Then use `/plugin` to check that `atchoum` is loaded, and `/mcp` to check the
-state of the `merlin` server.
+Do not combine it with the installed plugin: the session copy replaces the
+installed one.
+
+### Check and reload
+
+- `/mcp` lists the plugin's `merlin` server and its tools.
+- After editing plugin files, run `/reload-plugins` or start a new session.
+- After rebuilding the server, start a new session: a running server keeps its
+  connection.
+- `ocamlmerlin` (and `dune`) must be in the `PATH` of the Claude Code process,
+  from the switch of the project being analysed. In VS Code, start the editor
+  from a shell where `eval $(opam env)` has been run.
 
 ## License
 
