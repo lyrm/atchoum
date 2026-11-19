@@ -1,0 +1,12 @@
+{
+  "name": "atchoum-dev",
+  "description": "Local development marketplace for the atchoum plugin",
+  "owner": { "name": "Carine Morel" },
+  "plugins": [
+    {
+      "name": "atchoum",
+      "source": "./",
+      "description": "Merlin-powered MCP tools for navigating and editing OCaml code"
+    }
+  ]
+}

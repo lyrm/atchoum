@@ -79,7 +79,7 @@ atchoum/
 ├── commands/         # Slash commands (*.md)
 ├── hooks/            # Hook configuration (hooks.json) and scripts
 ├── skills/           # Skills (<skill-name>/SKILL.md)
-├── bin/              # atchoum-mcp: Eio main loop serving MCP over stdio
+├── server/           # atchoum-mcp: Eio main loop serving MCP over stdio
 ├── lib/              # Merlin calls (merlin.ml) and mcp-kit tools (server.ml)
 └── test/             # Alcotest suite
 ```
