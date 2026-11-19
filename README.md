@@ -37,11 +37,11 @@ The tools appear in Claude Code as `mcp__plugin_atchoum_merlin__<tool>`.
 
 | Tool | Arguments | Result |
 |------|-----------|--------|
-| `type_enclosing` | `file` (path, absolute recommended), `line` (from 1), `col` (from 0) | Merlin's raw JSON answer to `type-enclosing`: the enclosing expressions, innermost first, with their positions and types |
-| `locate` | `file`, `line`, `col` as above; optional `prefix` (identifier to locate instead of the one at the position, e.g. `List.map`) and `look_for` (`interface` or `implementation`) | Merlin's raw JSON answer to `locate`: the file and position of the definition, or a string explaining why it could not be found |
+| `type_enclosing` | `file` (path, absolute recommended), `line` (from 1), `col` (from 0) | The type of the innermost expression at the position, e.g. `('a -> 'b) -> 'a list -> 'b list` |
+| `locate` | `file`, `line`, `col` as above; optional `prefix` (identifier to locate instead of the one at the position, e.g. `List.map`) and `look_for` (`interface` or `implementation`) | `FILE:LINE:COL` of the definition, then its source line; an error result with Merlin's reason when it is not found |
 
 Each tool runs `ocamlmerlin single <command>` with the file's contents on
-standard input.
+standard input, and keeps only the useful part of Merlin's JSON answer.
 
 Guidance on when to use the tools lives in two places in
 [`lib/server.ml`](lib/server.ml): the server `instructions`, which Claude Code

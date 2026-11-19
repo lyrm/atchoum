@@ -18,13 +18,12 @@ When working on OCaml code, use these tools instead of grep, sed or reading file
 
 Every tool takes a file and a position: line starts at 1 and col at 0. Pass absolute paths.
 
-Answers are Merlin's raw JSON: when "class" is "return", the result is in "value". If Merlin reports an unbound module of the same project, run `dune build` first: Merlin reads the build artefacts of the other modules.|}
+Answers are short: a type, or a location with the source line of the definition. If Merlin reports an unbound module of the same project, run `dune build` first: Merlin reads the build artefacts of the other modules.|}
 
 let type_enclosing_description =
-  "Type of the expression at LINE:COL in an OCaml file, as reported by Merlin. \
-   Use it instead of reading the surrounding code to work out a type. Lines \
-   start at 1, columns at 0. Returns Merlin's raw JSON answer: the enclosing \
-   expressions, innermost first, with their positions and types."
+  "Type of the innermost expression at LINE:COL in an OCaml file, as reported \
+   by Merlin. Use it instead of reading the surrounding code to work out a \
+   type. Lines start at 1, columns at 0. Returns the type only."
 
 (* Every tool takes a position in a file. *)
 let position_properties =
@@ -50,9 +49,25 @@ let read_position args =
   let* col = Tool.Arg.int "col" args in
   Ok (file, line, col)
 
-let tool_result = function
-  | Ok json -> Ok (Tool.text json)
+let tool_result to_text = function
+  | Ok answer -> Ok (Tool.text (to_text answer))
   | Error msg -> Ok (Tool.error_text msg)
+
+(* Line [n] (from 1) of [file], trimmed, if it can be read. *)
+let source_line ~fs file n =
+  match Eio.Path.load Eio.Path.(fs / file) with
+  | exception Eio.Io _ -> None
+  | contents ->
+      List.nth_opt (String.split_on_char '\n' contents) (n - 1)
+      |> Option.map String.trim
+
+(* FILE:LINE:COL, then the definition's source line so that it needs no
+   separate read. *)
+let location_text ~fs { Merlin.file; pos = { line; col } } =
+  let where = Printf.sprintf "%s:%d:%d" file line col in
+  match source_line ~fs file line with
+  | Some src when src <> "" -> where ^ "\n" ^ src
+  | _ -> where
 
 let type_enclosing_schema =
   Schema.object_ ~properties:position_properties ~required:position_required ()
@@ -61,14 +76,15 @@ let type_enclosing ~fs ~process_mgr =
   Tool.make ~title:"Type enclosing" ~description:type_enclosing_description
     ~input_schema:type_enclosing_schema "type_enclosing" (fun args ->
       let* file, line, col = read_position args in
-      tool_result (Merlin.type_enclosing ~fs ~process_mgr ~file ~line ~col))
+      tool_result Fun.id
+        (Merlin.type_enclosing ~fs ~process_mgr ~file ~line ~col))
 
 let locate_description =
   "Find where the identifier at LINE:COL (or PREFIX) in an OCaml file is \
    defined, as reported by Merlin. Use it instead of grep to find a \
    definition, including in libraries and the standard library. Lines start at \
-   1, columns at 0. Returns Merlin's raw JSON answer: the file and position of \
-   the definition, or a string explaining why it could not be found."
+   1, columns at 0. Returns FILE:LINE:COL of the definition followed by its \
+   source line, or an error explaining why it could not be found."
 
 let locate_schema =
   Schema.object_
@@ -102,7 +118,7 @@ let locate ~fs ~process_mgr =
       let* prefix = Tool.Arg.(optional string) "prefix" args in
       let* look_for = Tool.Arg.(optional string) "look_for" args in
       let* look_for = look_for_of_string look_for in
-      tool_result
+      tool_result (location_text ~fs)
         (Merlin.locate ~fs ~process_mgr ?prefix ?look_for ~file ~line ~col ()))
 
 let create ~fs ~process_mgr () =

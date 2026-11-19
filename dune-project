@@ -28,6 +28,8 @@
     (< 0.3)))
   (eio
    (>= 1.6))
+  (yojson
+   (>= 2.0))
   (eio_main
    (>= 1.6))
   (alcotest :with-test)
