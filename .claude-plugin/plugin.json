@@ -4,5 +4,11 @@
   "description": "Merlin-powered MCP tools for navigating and editing OCaml code, to use instead of grep, sed and other text-based tools.",
   "author": { "name": "Carine Morel" },
   "license": "MIT",
-  "keywords": ["ocaml", "merlin", "mcp"]
+  "keywords": ["ocaml", "merlin", "mcp"],
+  "mcpServers": {
+    "merlin": {
+      "command": "${CLAUDE_PLUGIN_ROOT}/_build/install/default/bin/atchoum-mcp",
+      "args": []
+    }
+  }
 }

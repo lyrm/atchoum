@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "merlin": {
-      "command": "${CLAUDE_PLUGIN_ROOT}/_build/install/default/bin/atchoum-mcp",
-      "args": []
-    }
-  }
-}

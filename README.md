@@ -62,15 +62,14 @@ dune test
 ```
 
 `dune build` produces `_build/install/default/bin/atchoum-mcp`, the executable
-that `.mcp.json` launches.
+that the plugin launches.
 
 ## Layout
 
 ```
 atchoum/
 ├── .claude-plugin/
-│   └── plugin.json   # Plugin manifest (name, version, metadata)
-├── .mcp.json         # MCP server declaration
+│   └── plugin.json   # Plugin manifest: metadata and MCP server declaration
 ├── agents/           # Subagent definitions (*.md)
 ├── commands/         # Slash commands (*.md)
 ├── hooks/            # Hook configuration (hooks.json) and scripts
@@ -88,10 +87,15 @@ Claude Code sets to the plugin's install location.
 
 ## MCP server
 
-`.mcp.json` declares a stdio server named `merlin`, launched from
+The `mcpServers` field of `.claude-plugin/plugin.json` declares a stdio server
+named `merlin`, launched from
 `${CLAUDE_PLUGIN_ROOT}/_build/install/default/bin/atchoum-mcp`. The server is
 built with [mcp-kit](https://gitlab.com/nomadic-labs/ai-harness/ocaml-mcp) and
 [Eio](https://github.com/ocaml-multicore/eio).
+
+The declaration lives in `plugin.json` rather than in a root `.mcp.json`:
+Claude Code would also read a root `.mcp.json` as this repository's project
+MCP configuration, where `${CLAUDE_PLUGIN_ROOT}` is undefined.
 
 If the executable has not been built, `/mcp` shows the server as failed; the
 rest of the plugin still loads.
