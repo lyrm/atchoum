@@ -1,0 +1,19 @@
+schema_version: "1.1"
+name: aliased-create
+description: Definition of create among 8 homonyms, reached through a module alias
+tags: [merlin, cost, hard]
+runs: 3
+execution:
+  prompt: "In lib/demo.ml, line 3, in which file and at which line is the `create` function called there defined?"
+  max_turns: 10
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-file
+    type: regex
+    pattern: 'gamma\.ml'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__locate
+    arm: with-only

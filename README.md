@@ -115,6 +115,17 @@ dune build
 ./evals/run.sh --case type-of-stdlib-function --runs 3
 ```
 
+| Case | Tool | Question |
+|------|------|----------|
+| `type-of-stdlib-function` | `type_enclosing` | Type of `Seq.unfold` (answerable from memory) |
+| `shadowed-list-map` | `type_enclosing` | Type of a `List.map` shadowed through `open` and `include` |
+| `inferred-variant-type` | `type_enclosing` | Inferred type of an unannotated function with optional, labelled and polymorphic variant arguments |
+| `aliased-create` | `locate` | Definition of `create` among 8 homonyms, reached through a module alias |
+| `aliased-create-large` | `locate` | Same with 80 homonyms and 80 aliases |
+
+The last four cases carry the `hard` tag (`./evals/run.sh --tag hard`). Their
+scaffolds run `dune build`, so `dune` must be in the `PATH`.
+
 `run.sh` runs the evals on a minimal copy of the plugin (the checkout's
 `_opam/` and `_build/` exceed the eval's entry limit), with the real MCP
 server. It then copies the run traces to `evals/results/<timestamp>/traces/`

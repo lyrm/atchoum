@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: inferred-variant-type
+description: Inferred type of an unannotated function with optional, labelled and polymorphic variant arguments
+tags: [merlin, cost, hard]
+runs: 3
+execution:
+  prompt: "What is the type of `f` in lib/demo.ml? Answer with the type only."
+  max_turns: 10
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-type
+    type: regex
+    # ?k:int -> g:(int -> int) -> [< `A of int | `B of string ] -> int, in any constructor order
+    pattern: '^(?=[\s\S]*\?k:int)(?=[\s\S]*g:\(int -> int\))(?=[\s\S]*\[<)(?=[\s\S]*`A of int)(?=[\s\S]*`B of string)'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__type_enclosing
+    arm: with-only

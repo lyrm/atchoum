@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: shadowed-list-map
+description: Type of a List.map shadowed through open/include; the stdlib answer is wrong
+tags: [merlin, cost, hard]
+runs: 3
+execution:
+  prompt: "In lib/demo.ml, line 4, what is the type of `List.map`? Answer with the type only."
+  max_turns: 10
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-type
+    type: regex
+    # ('a -> 'b) -> 'a * 'a -> 'b * 'b, whatever the type variable names
+    pattern: '\(''(\w+) -> ''(\w+)\) -> ''\1 \* ''\1 -> ''\2 \* ''\2'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__type_enclosing
+    arm: with-only
