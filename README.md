@@ -105,6 +105,22 @@ MCP configuration, where `${CLAUDE_PLUGIN_ROOT}` is undefined.
 If the executable has not been built, `/mcp` shows the server as failed; the
 rest of the plugin still loads.
 
+## Evals
+
+`evals/` holds [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals.md)
+cases: each runs a prompt on a scaffolded project with and without the plugin.
+
+```sh
+dune build
+./evals/run.sh --case type-of-stdlib-function --runs 3
+```
+
+`run.sh` runs the evals on a minimal copy of the plugin (the checkout's
+`_opam/` and `_build/` exceed the eval's entry limit), with the real MCP
+server. It then copies the run traces to `evals/results/<timestamp>/traces/`
+and prints mean tokens, cost and turns per case and arm (`evals/summarize.py`,
+also written to `tokens.json`).
+
 ## Using the plugin
 
 Build the server first (see [Build](#build)). Claude Code launches the

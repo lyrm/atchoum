@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: type-of-stdlib-function
+description: Type of a stdlib function used in a small dune project, with and without atchoum
+tags: [merlin, cost]
+runs: 3
+execution:
+  prompt: "In lib/demo.ml, what is the type of the stdlib function used on line 1? Answer with the type only."
+  max_turns: 10
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-type
+    type: regex
+    # ('b -> ('a * 'b) option) -> 'b -> 'a Seq.t, whatever the type variable names
+    pattern: "\\('(\\w+) -> \\('(\\w+) \\* '\\1\\) option\\) -> '\\1 -> '\\2 (Seq\\.)?t"
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__type_enclosing
+    arm: with-only
