@@ -25,7 +25,15 @@ cp "$exe" "$stage/_build/install/default/bin/atchoum-mcp"
 out="$root/evals/results/$(date -u +%Y-%m-%dT%H-%M-%SZ)"
 mkdir -p "$out"
 
-claude plugin eval "$stage" \
+# Run in the local switch's environment when there is one, so that the MCP
+# server and the scaffolds find its ocamlmerlin and dune: Merlin cannot read a
+# project built by another version of dune.
+in_switch=""
+if [ -d "$root/_opam" ]; then
+  in_switch="opam exec --switch=$root --"
+fi
+
+$in_switch claude plugin eval "$stage" \
   --scaffold \
   --mocks off \
   --allow-tools 'mcp__plugin_atchoum_merlin__*' \

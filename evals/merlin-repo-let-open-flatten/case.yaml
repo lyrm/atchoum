@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: merlin-repo-let-open-flatten
+description: Definition of an unqualified flatten resolved through a local let open
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. In src/analysis/destruct.ml, line 437, in which file is the `flatten` function called there defined? Answer with the file path."
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-answer
+    type: regex
+    pattern: 'longident\.ml'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__locate
+    arm: with-only

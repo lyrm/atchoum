@@ -123,8 +123,28 @@ dune build
 | `aliased-create` | `locate` | Definition of `create` among 8 homonyms, reached through a module alias |
 | `aliased-create-large` | `locate` | Same with 80 homonyms and 80 aliases |
 
-The last four cases carry the `hard` tag (`./evals/run.sh --tag hard`). Their
-scaffolds run `dune build`, so `dune` must be in the `PATH`.
+| `merlin-repo-fold-n-map` | `type_enclosing` | Type of a Merlin-specific `List` function reached through `open Std` |
+| `merlin-repo-punned-field` | `type_enclosing` | Inferred type of an unannotated, unexported function of `src/analysis/destruct.ml` |
+| `merlin-repo-let-open-flatten` | `locate` | Definition of an unqualified `flatten` resolved through a local `let open` |
+| `merlin-repo-printtyp-alias` | `locate` | Definition of a function reached through a local alias that shadows a compiler module |
+
+The `hard` cases scaffold small dune projects (`./evals/run.sh --tag hard`);
+they run `dune build`.
+
+The `merlin-repo` cases (`./evals/run.sh --tag merlin-repo`) ask questions
+about the code of Merlin itself. Their scaffold copies a prebuilt clone, which
+must exist first:
+
+```sh
+git clone --depth 1 --branch v5.9.1-505 https://github.com/ocaml/merlin ~/src/merlin-bench
+cd ~/src/merlin-bench
+opam exec --switch=/path/to/atchoum -- dune build @src/check
+```
+
+The clone must be built with atchoum's local switch: `run.sh` runs the evals
+in that switch's environment, and Merlin cannot read a project built by
+another version of dune. The clone's path is set in each case's
+`scaffold.sh`.
 
 `run.sh` runs the evals on a minimal copy of the plugin (the checkout's
 `_opam/` and `_build/` exceed the eval's entry limit), with the real MCP

@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: merlin-repo-printtyp-alias
+description: Definition of a function reached through a local module alias that shadows a compiler module
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. In src/frontend/query_commands.ml, line 374, in which file is the `Printtyp.wrap_printing_env` function called there defined? Answer with the file path."
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-answer
+    type: regex
+    pattern: 'type_utils\.ml'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__locate
+    arm: with-only

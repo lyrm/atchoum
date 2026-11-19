@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: merlin-repo-punned-field
+description: Inferred type of an unannotated, unexported function depending on the vendored typer
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. What is the type of the function `find_field_name_for_punned_field` defined on line 520 of src/analysis/destruct.ml? Answer with the type only."
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-answer
+    type: regex
+    pattern: '^(?=[\s\S]*pattern_data)(?=[\s\S]*node list)(?=[\s\S]*Data_types\.label_description option)'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__type_enclosing
+    arm: with-only

@@ -1,0 +1,20 @@
+schema_version: "1.1"
+name: merlin-repo-fold-n-map
+description: Type of a Merlin-specific List function, reached through open Std
+tags: [merlin, cost, merlin-repo]
+runs: 3
+execution:
+  prompt: "This is the source code of Merlin. What is the type of the `List.fold_n_map` function used on line 149 of src/analysis/browse_misc.ml? Answer with its polymorphic type only."
+  max_turns: 30
+  timeout_seconds: 600
+  allowed_tools: [Read, Grep, Glob]
+context:
+  scaffold_script: scaffold.sh
+graders:
+  - name: correct-answer
+    type: regex
+    pattern: 'f:\(''(\w+) -> ''(\w+) -> ''\1 \* ''(\w+)\) -> init:''\1 -> ''\2 list -> ''\1 \* ''\3 list'
+  - name: merlin-used
+    type: tool_used
+    tool: mcp__plugin_atchoum_merlin__type_enclosing
+    arm: with-only
